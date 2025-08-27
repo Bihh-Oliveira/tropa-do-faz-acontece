@@ -1,1 +1,54 @@
-....
+import re
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+
+# Função de pré-processamento
+def limpar_texto(texto):
+    texto = texto.lower()
+    texto = re.sub(r'[^\w\s]', '', texto)
+    texto = re.sub(r'\d+', '', texto)
+    texto = texto.strip()
+    return texto
+
+# 1. Dataset (Frases e Rótulos) para o bot acadêmico
+frases = [
+    "Quando abre a matrícula?",
+    "Não consigo me matricular",
+    "Qual a minha nota final?",
+    "Minhas notas não foram lançadas",
+    "Vocês têm algum evento?",
+    "Queria saber sobre a próxima palestra",
+    "Qual o horário da biblioteca?",
+    "Preciso devolver um livro"
+]
+
+rotulos = [
+    "matricula",
+    "matricula",
+    "notas",
+    "notas",
+    "eventos",
+    "eventos",
+    "biblioteca",
+    "biblioteca"
+]
+
+# 2. Pré-processamento e Vetorização
+frases_limpas = [limpar_texto(f) for f in frases]
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(frases_limpas)
+
+# 3. Treinamento do Modelo Naive Bayes
+modelo = MultinomialNB()
+modelo.fit(X, rotulos)
+
+# 4. Previsão com uma nova frase
+while True:
+    nova_frase = input("\nDigite uma mensagem para o bot (ou 'sair' para encerrar): ")
+    if nova_frase.lower() == "sair":
+        break
+    
+    nova_frase_limpa = limpar_texto(nova_frase)
+    X_novo = vectorizer.transform([nova_frase_limpa])
+    predicao = modelo.predict(X_novo)
+    print(f"A intenção da sua mensagem é: {predicao[0]}")
