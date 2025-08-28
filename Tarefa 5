@@ -1,0 +1,54 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+import pandas as pd
+
+# 1. Dataset
+# Aumentei o número de frases para ter uma melhor representação dos clusters
+frases = [
+    # Passagens
+    "Qual o valor da passagem para o Rio de Janeiro?",
+    "Preciso de uma passagem aérea para Salvador",
+    "Preço de voo para São Paulo",
+
+    # Hospedagem
+    "Quero reservar um hotel em Gramado",
+    "Procuro pousadas em Ubatuba",
+    "Precisa de um quarto de hotel para 3 pessoas em Paraty",
+
+    # Passeios
+    "Quais os melhores passeios no Pantanal?",
+    "Recomendação de trilhas na Chapada Diamantina",
+    "O que fazer em Bonito?",
+
+    # Restaurantes
+    "Indicação de restaurantes em Belo Horizonte",
+    "Onde comer bem e barato em Salvador?",
+    "Quero reservar uma mesa para 4 pessoas em um restaurante italiano"
+]
+
+# 2. Vetorização
+# TfidfVectorizer é mais adequado para este caso, pois considera a importância das palavras
+vectorizer = TfidfVectorizer(stop_words=['de', 'para', 'em', 'com', 'e', 'do', 'da', 'o', 'a', 'um', 'uma'])
+X = vectorizer.fit_transform(frases)
+
+# 3. Modelo KMeans
+# Defini o número de clusters como 4, um para cada categoria de frase
+k = 4
+model = KMeans(n_clusters=k, init='k-means++', max_iter=300, n_init=10, random_state=0)
+model.fit(X)
+
+# 4. Saída
+# Criando um DataFrame para uma visualização mais clara dos resultados
+clusters = model.labels_.tolist()
+frases_df = pd.DataFrame({'frase': frases, 'cluster': clusters})
+
+print("Agrupamento das frases por cluster:\n")
+for i in range(k):
+    print(f"--- Cluster {i} ---")
+    print("\n".join(frases_df[frases_df['cluster'] == i]['frase']))
+    print("\n")
+
+# Para imprimir a qual cluster cada frase pertence individualmente
+print("--- Saída individual de cada frase e seu cluster ---")
+for i, frase in enumerate(frases):
+    print(f"Frase: '{frase}' -> Cluster: {clusters[i]}")
