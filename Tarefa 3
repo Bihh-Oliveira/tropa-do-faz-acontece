@@ -1,0 +1,31 @@
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+
+# Dados de Treino: [distancia_km, numero_de_pizzas]
+dados_entregas = np.array([
+    [5, 2],   # 5 km, 2 pizzas
+    [2, 1],   # 2 km, 1 pizza
+    [6, 3],   # 6 km, 3 pizzas
+    [3, 1],   # 3 km, 1 pizza
+    [4, 2],   # 4 km, 2 pizzas
+    [1, 1]    # 1 km, 1 pizza
+])
+
+# Rótulos (classes): 0 = "Atrasado", 1 = "No prazo"
+rotulos = np.array([0, 1, 0, 1, 0, 1])
+
+# Criação e treinamento do modelo
+modelo_knn = KNeighborsClassifier(n_neighbors=3)
+modelo_knn.fit(dados_entregas, rotulos)
+
+# Nova entrega para prever
+nova_entrega = np.array([[7, 3]])
+
+# Previsão
+previsao = modelo_knn.predict(nova_entrega)
+
+# Resultado
+if previsao[0] == 0:
+    print("Previsão: Atrasado")
+else:
+    print("Previsão: No prazo")
